@@ -1,0 +1,9 @@
+numpy
+matplotlib
+pandas
+gymnasium
+stable-baselines3[extra]
+pygame
+jupyterlab
+notebook
+ipykernel
