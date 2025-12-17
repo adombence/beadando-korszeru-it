@@ -1,13 +1,14 @@
 from __future__ import annotations
+
 import gymnasium as gym
 import numpy as np
 
+from adapter.cartpole import CartPoleAdapter, CartPoleConfig
 from algorithms.base import AgentConfig
 from algorithms.q_learning import QLearningAgent
 from algorithms.sarsa import SARSAAgent
+from experiments.common import evaluate, seed_everything, summarize, train
 
-from adapter.cartpole import CartPoleAdapter, CartPoleConfig
-from experiments.common import train, evaluate, summarize, seed_everything
 
 def run(agent_cls, name: str):
     base_env = gym.make("CartPole-v1")
@@ -37,17 +38,19 @@ def run(agent_cls, name: str):
         per_seed.append(summarize(eval_logs))
 
     sr = np.array([x["success_rate"] for x in per_seed], dtype=np.float32)
-    rm = np.array([x["return_mean"]  for x in per_seed], dtype=np.float32)
-    lm = np.array([x["length_mean"]  for x in per_seed], dtype=np.float32)
+    rm = np.array([x["return_mean"] for x in per_seed], dtype=np.float32)
+    lm = np.array([x["length_mean"] for x in per_seed], dtype=np.float32)
 
     print(f"\n=== {name} | CartPole-v1 (discretized) ===")
     print(f"Success rate: {sr.mean():.3f} ± {sr.std(ddof=1):.3f}   (success ~ reached max_steps)")
     print(f"Return mean : {rm.mean():.1f} ± {rm.std(ddof=1):.1f}")
     print(f"Length mean : {lm.mean():.1f} ± {lm.std(ddof=1):.1f}")
 
+
 def main():
     run(QLearningAgent, "Q-learning")
     run(SARSAAgent, "SARSA")
+
 
 if __name__ == "__main__":
     main()

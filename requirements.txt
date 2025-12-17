@@ -7,3 +7,5 @@ pygame
 jupyterlab
 notebook
 ipykernel
+ruff
+black
