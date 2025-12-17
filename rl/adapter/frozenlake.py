@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any
 
 import gymnasium as gym
@@ -12,8 +14,8 @@ class FrozenLakeAdapter:
             raise ValueError("FrozenLake adapter expects a Discrete observation space.") from e
         self.n_actions = int(env.action_space.n)
 
-    def reset(self) -> int:
-        obs, _info = self.env.reset()
+    def reset(self, seed: int | None = None) -> int:
+        obs, _info = self.env.reset(seed=seed)
         return int(obs)
 
     def step(self, action: int) -> tuple[int, float, bool, dict[str, Any]]:

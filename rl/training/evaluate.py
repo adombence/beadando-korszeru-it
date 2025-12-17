@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from .train import EpisodeLog
+from .types import EpisodeLog
 
 
 def evaluate(env, agent, episodes: int, max_steps: int) -> list[EpisodeLog]:

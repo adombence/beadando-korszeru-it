@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import numpy as np
+from rl.adapter import EnvAdapter
 from rl.training.types import EpisodeLog
 
 
@@ -12,12 +13,13 @@ def _infer_success(done: bool, reward: float, t: int, max_steps: int, info: dict
     return t + 1 >= max_steps
 
 
-def train(env, agent, episodes: int, max_steps: int) -> list[EpisodeLog]:
+def train(env: EnvAdapter, agent, episodes: int, max_steps: int, episode_seed_base: int | None = None) -> list[EpisodeLog]:
     logs: list[EpisodeLog] = []
 
     for ep in range(episodes):
-        s = env.reset()
-        a = agent.act(s, greedy=False)
+        # Optional per-episode deterministic seeding
+        s = env.reset(seed=(episode_seed_base + ep) if episode_seed_base is not None else None)
+        a = agent.act(s, policy="epsilon_greedy")
 
         ep_return = 0.0
         td_errors: list[float] = []
@@ -27,7 +29,7 @@ def train(env, agent, episodes: int, max_steps: int) -> list[EpisodeLog]:
             s_next, r, done, info = env.step(a)
             ep_return += float(r)
 
-            a_next = agent.act(s_next, greedy=False) if not done else 0
+            a_next = agent.act(s_next, policy="epsilon_greedy") if not done else 0
             td = agent.update(s, a, float(r), s_next, a_next, bool(done))
             td_errors.append(float(td))
 
@@ -50,7 +52,7 @@ def train(env, agent, episodes: int, max_steps: int) -> list[EpisodeLog]:
     return logs
 
 
-def evaluate(env, agent, episodes: int, max_steps: int) -> list[EpisodeLog]:
+def evaluate(env: EnvAdapter, agent, episodes: int, max_steps: int) -> list[EpisodeLog]:
     logs: list[EpisodeLog] = []
 
     for ep in range(episodes):
@@ -59,7 +61,7 @@ def evaluate(env, agent, episodes: int, max_steps: int) -> list[EpisodeLog]:
         success = False
 
         for t in range(max_steps):
-            a = agent.act(s, greedy=True)
+            a = agent.act(s, policy="greedy")
             s, r, done, info = env.step(a)
             ep_return += float(r)
 

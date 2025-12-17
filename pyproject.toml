@@ -7,15 +7,18 @@ skip-string-normalization = true
 line-length = 100
 target-version = "py311"
 src = ["rl"]
-fix = false
+fix = true
 
 [tool.ruff.lint]
 select = [
-  "E", "F", "W",
+  "E",
+  "F",
+  "W",
   "I",
   "B",
   "UP",
-  "SIM"
+  "SIM",
+  "ARG"
 ]
 ignore = [
   "E501"

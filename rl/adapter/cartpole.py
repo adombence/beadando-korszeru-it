@@ -36,7 +36,7 @@ class CartPoleAdapter:
         ranges = [cfg.x_range, cfg.x_dot_range, cfg.theta_range, cfg.theta_dot_range]
         self._edges = [
             np.linspace(lo, hi, num=b + 1, endpoint=True)[1:-1]  # internal cut points
-            for (lo, hi), b in zip(ranges, self._bins, strict=False)
+            for (lo, hi), b in zip(ranges, self._bins)
         ]
 
         # base multipliers to map 4D index -> scalar id
@@ -56,11 +56,11 @@ class CartPoleAdapter:
 
     def _discretize(self, obs: np.ndarray) -> int:
         obs = self._clip_obs(obs)
-        idxs = [int(np.digitize(v, e)) for v, e in zip(obs, self._edges, strict=False)]  # 0..bins-1
+        idxs = [int(np.digitize(v, e)) for v, e in zip(obs, self._edges)]  # 0..bins-1
         return int(np.dot(np.array(idxs, dtype=np.int32), self._bases))
 
-    def reset(self) -> int:
-        obs, _info = self.env.reset()
+    def reset(self, seed: int | None = None) -> int:
+        obs, _info = self.env.reset(seed=seed)
         return self._discretize(np.asarray(obs, dtype=np.float32))
 
     def step(self, action: int) -> tuple[int, float, bool, dict[str, Any]]:
